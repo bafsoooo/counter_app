@@ -1,49 +1,34 @@
-import 'dart:math';
-
+import 'package:counter_app/controller/counter_cubit.dart';
 import 'package:counter_app/views/counters_widgets/counter_text.dart';
 import 'package:counter_app/views/counters_widgets/increment_counter.dart';
 import 'package:counter_app/views/counters_widgets/increment_counter_randomly.dart';
 import 'package:counter_app/views/counters_widgets/reset_counter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class Counter extends StatefulWidget {
+class Counter extends StatelessWidget {
   const Counter({super.key});
 
   @override
-  State<StatefulWidget> createState() => _CounterState();
-}
-
-class _CounterState extends State<StatefulWidget> {
-  var counter = 0;
-
-  void increment() {
-    setState(() {
-      counter++;
-    });
-  }
-
-  void incrementRandomly() {
-    setState(() {
-      counter += Random().nextInt(10) + 1;
-    });
-  }
-
-  void reset() {
-    setState(() {
-      counter = 0;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CounterText(counter: '$counter'),
-        IncrementCounter(increment: increment),
-        IncrementCounterRandomly(incrementRandomly: incrementRandomly),
-        ResetCounter(reset: reset),
-      ],
+    return BlocProvider(
+      create: (_) => CounterCubit(),
+      child: BlocBuilder<CounterCubit, int>(
+        builder: (context, counter) {
+          final cubit = context.read<CounterCubit>();
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CounterText(counter: '$counter'),
+              IncrementCounter(increment: cubit.increment),
+              IncrementCounterRandomly(
+                incrementRandomly: cubit.incrementRandomly,
+              ),
+              ResetCounter(reset: cubit.reset),
+            ],
+          );
+        },
+      ),
     );
   }
 }
